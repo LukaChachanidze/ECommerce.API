@@ -1,4 +1,5 @@
-﻿using System.Data.SqlClient;
+﻿using System.Data;
+using System.Data.SqlClient;
 using Task_ECommerce.Domain.Entities;
 
 namespace Task_ECommerce.Repository.UsersRepository
@@ -34,15 +35,16 @@ namespace Task_ECommerce.Repository.UsersRepository
             {
                 await connection.OpenAsync();
 
-                using (var command = new SqlCommand("INSERT INTO Users (UserName, Email, PasswordHash, CreatedAt, UpdatedAt) VALUES (@userName, @email, @passwordHash, @createdAt, @updatedAt); SELECT CAST(SCOPE_IDENTITY() as int)", connection))
+                using (var command = new SqlCommand("RegisterUser", connection))
                 {
+                    command.CommandType = CommandType.StoredProcedure;
                     command.Parameters.AddWithValue("@userName", userName);
                     command.Parameters.AddWithValue("@email", email);
                     command.Parameters.AddWithValue("@passwordHash", password);
                     command.Parameters.AddWithValue("@createdAt", DateTime.Now);
                     command.Parameters.AddWithValue("@updatedAt", DateTime.Now);
 
-                    await command.ExecuteScalarAsync();
+                    int userId = Convert.ToInt32(await command.ExecuteScalarAsync());
 
                     return await GetByUserNameAsync(userName);
                 }
@@ -60,8 +62,9 @@ namespace Task_ECommerce.Repository.UsersRepository
             {
                 await connection.OpenAsync();
 
-                using (var command = new SqlCommand("SELECT * FROM Users WHERE UserName = @userName", connection))
+                using (var command = new SqlCommand("GetUserByUserName", connection))
                 {
+                    command.CommandType = CommandType.StoredProcedure;
                     command.Parameters.AddWithValue("@userName", userName);
 
                     using (var reader = await command.ExecuteReaderAsync())

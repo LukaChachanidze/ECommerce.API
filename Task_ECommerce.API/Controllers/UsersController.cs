@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Task_ECommerce.Services.Users;
 using Task_ECommerce.Services.Users.DTO;
 
@@ -23,6 +22,11 @@ namespace Task_ECommerce.API.Controllers
         }
         #endregion
 
+        /// <summary>
+        /// Method to register new user
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         #region action methods
         [HttpPost(nameof(Register))]
         public async Task<IActionResult> Register([FromBody] UserForRegistrationDto request)
@@ -35,6 +39,11 @@ namespace Task_ECommerce.API.Controllers
             return Ok(user);
         }
 
+        /// <summary>
+        /// Method to log in as a user
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost(nameof(Login))]
         public async Task<IActionResult> Login([FromBody] UserForLoginDTO request)
         {

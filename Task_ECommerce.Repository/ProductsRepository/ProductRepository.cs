@@ -1,4 +1,5 @@
-﻿using System.Data.SqlClient;
+﻿using System.Data;
+using System.Data.SqlClient;
 using Task_ECommerce.Domain.Entities;
 
 namespace Task_ECommerce.Repository.ProductsRepository
@@ -25,8 +26,9 @@ namespace Task_ECommerce.Repository.ProductsRepository
             using (var connection = new SqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
-                using (var command = new SqlCommand("SELECT * FROM Products WHERE Id = @id", connection))
+                using (var command = new SqlCommand("GetProductById", connection))
                 {
+                    command.CommandType = CommandType.StoredProcedure;
                     command.Parameters.AddWithValue("@id", id);
                     using (var reader = await command.ExecuteReaderAsync())
                     {
@@ -51,7 +53,7 @@ namespace Task_ECommerce.Repository.ProductsRepository
             using (var connection = new SqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
-                using (var command = new SqlCommand("SELECT * FROM Products", connection))
+                using (var command = new SqlCommand("GetAllProducts", connection))
                 {
                     using (var reader = await command.ExecuteReaderAsync())
                     {
@@ -77,8 +79,9 @@ namespace Task_ECommerce.Repository.ProductsRepository
             using (var connection = new SqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
-                using (var command = new SqlCommand("INSERT INTO Products (Name, Description, Price, CreatedAt, UpdatedAt) VALUES (@name, @description, @price, @createdAt, @updatedAt); SELECT SCOPE_IDENTITY()", connection))
+                using (var command = new SqlCommand("InsertProduct", connection))
                 {
+                    command.CommandType = CommandType.StoredProcedure;
                     command.Parameters.AddWithValue("@name", entity.Name);
                     command.Parameters.AddWithValue("@description", entity.Description);
                     command.Parameters.AddWithValue("@price", entity.Price);
@@ -89,19 +92,21 @@ namespace Task_ECommerce.Repository.ProductsRepository
             }
         }
 
+
         public async Task<int> UpdateAsync(Product entity)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
+                using (var command = new SqlCommand("UpdateProduct", connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@Name", entity.Name);
+                    command.Parameters.AddWithValue("@Description", entity.Description);
+                    command.Parameters.AddWithValue("@Id", entity.Id);
 
-                var sql = "UPDATE Products SET Name = @Name, Description = @Description WHERE Id = @Id";
-                var command = new SqlCommand(sql, connection);
-                command.Parameters.AddWithValue("@Name", entity.Name);
-                command.Parameters.AddWithValue("@Description", entity.Description);
-                command.Parameters.AddWithValue("@Id", entity.Id);
-
-                return await command.ExecuteNonQueryAsync();
+                    return await command.ExecuteNonQueryAsync();
+                }
             }
         }
 
@@ -111,11 +116,13 @@ namespace Task_ECommerce.Repository.ProductsRepository
             {
                 await connection.OpenAsync();
 
-                var sql = "DELETE FROM Products WHERE Id = @Id";
-                var command = new SqlCommand(sql, connection);
-                command.Parameters.AddWithValue("@Id", entity.Id);
+                using (var command = new SqlCommand("DeleteProduct", connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@Id", entity.Id);
 
-                return await command.ExecuteNonQueryAsync();
+                    return await command.ExecuteNonQueryAsync();
+                }
             }
         }
         #endregion

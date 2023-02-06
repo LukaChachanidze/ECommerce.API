@@ -1,4 +1,5 @@
-﻿using System.Data.SqlClient;
+﻿using System.Data;
+using System.Data.SqlClient;
 using Task_ECommerce.Domain.Entities;
 
 namespace Task_ECommerce.Repository.CartsRepository
@@ -26,16 +27,15 @@ namespace Task_ECommerce.Repository.CartsRepository
             {
                 await connection.OpenAsync();
 
-                using (var command = new SqlCommand("INSERT INTO Cart (UserId) VALUES (@userId); SELECT SCOPE_IDENTITY()", connection))
+                using (var command = new SqlCommand("CreateCart", connection))
                 {
-                    command.Parameters.AddWithValue("@userId", userId);
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@UserId", userId);
 
-                    var result = await command.ExecuteScalarAsync();
-                
+                    await command.ExecuteNonQueryAsync();
                 }
             }
         }
-
 
         /// <summary>
         /// Gets cart by userId
@@ -48,8 +48,9 @@ namespace Task_ECommerce.Repository.CartsRepository
             using (var connection = new SqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
-                using (var command = new SqlCommand("SELECT * FROM Cart WHERE UserId = @UserId", connection))
+                using (var command = new SqlCommand("GetCartByUserId", connection))
                 {
+                    command.CommandType = CommandType.StoredProcedure;
                     command.Parameters.AddWithValue("@UserId", userId);
                     using (var reader = await command.ExecuteReaderAsync())
                     {
@@ -67,6 +68,7 @@ namespace Task_ECommerce.Repository.CartsRepository
             return cart;
         }
 
+
         /// <summary>
         /// Gets cart items by cart id
         /// </summary>
@@ -78,8 +80,9 @@ namespace Task_ECommerce.Repository.CartsRepository
             using (var connection = new SqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
-                using (var command = new SqlCommand("SELECT * FROM CartItem WHERE CartId = @CartId", connection))
+                using (var command = new SqlCommand("GetCartItemsByCartId", connection))
                 {
+                    command.CommandType = CommandType.StoredProcedure;
                     command.Parameters.AddWithValue("@CartId", cartId);
                     using (var reader = await command.ExecuteReaderAsync())
                     {
@@ -96,6 +99,7 @@ namespace Task_ECommerce.Repository.CartsRepository
                     }
                 }
             }
+
 
             return cartItems;
         }
@@ -122,12 +126,13 @@ namespace Task_ECommerce.Repository.CartsRepository
                         cartId = await CreateCartForUserAsync(userId, connection, transaction);
                     }
 
-                    using (var command = new SqlCommand("INSERT INTO CartItem (CartId, ProductId, Quantity) VALUES (@CartId, @ProductId, @Quantity)", connection))
+                    using (var command = new SqlCommand("AddProductToCart", connection))
                     {
+                        command.CommandType = CommandType.StoredProcedure;
                         command.Transaction = transaction;
-                        command.Parameters.AddWithValue("@CartId", cartId);
                         command.Parameters.AddWithValue("@ProductId", productId);
                         command.Parameters.AddWithValue("@Quantity", quantity);
+                        command.Parameters.AddWithValue("@CartId", cartId);
                         await command.ExecuteNonQueryAsync();
                     }
 
@@ -148,11 +153,9 @@ namespace Task_ECommerce.Repository.CartsRepository
             using (var connection = new SqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
-                using (var command = connection.CreateCommand())
+                using (var command = new SqlCommand("RemoveProductFromCart", connection))
                 {
-                    command.CommandText = @"DELETE FROM [dbo].[CartItem]
-                                WHERE CartId = @CartId
-                                AND ProductId = @ProductId";
+                    command.CommandType = CommandType.StoredProcedure;
                     command.Parameters.AddWithValue("@CartId", cartId);
                     command.Parameters.AddWithValue("@UserId", userId);
                     command.Parameters.AddWithValue("@ProductId", productId);
@@ -170,10 +173,11 @@ namespace Task_ECommerce.Repository.CartsRepository
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                connection.Open();
+                await connection.OpenAsync();
 
-                using (var command = new SqlCommand("DELETE FROM Cart WHERE Id = @cartId", connection))
+                using (var command = new SqlCommand("dbo.DeleteCart", connection))
                 {
+                    command.CommandType = CommandType.StoredProcedure;
                     command.Parameters.AddWithValue("@cartId", cartId);
                     await command.ExecuteNonQueryAsync();
                 }
@@ -184,9 +188,10 @@ namespace Task_ECommerce.Repository.CartsRepository
         #region private methods
         private async Task<int?> GetCartIdForUserAsync(int userId, SqlConnection connection, SqlTransaction transaction)
         {
-            using (var command = new SqlCommand("SELECT Id FROM Cart WHERE UserId = @UserId", connection))
+            using (var command = new SqlCommand("GetCartIdForUser", connection))
             {
                 command.Transaction = transaction;
+                command.CommandType = CommandType.StoredProcedure;
                 command.Parameters.AddWithValue("@UserId", userId);
                 var result = await command.ExecuteScalarAsync();
                 if (result != null)
@@ -199,14 +204,15 @@ namespace Task_ECommerce.Repository.CartsRepository
 
         private async Task<int> CreateCartForUserAsync(int userId, SqlConnection connection, SqlTransaction transaction)
         {
-            using (var command = new SqlCommand("INSERT INTO Cart (UserId) VALUES (@UserId); SELECT SCOPE_IDENTITY()", connection))
+            using (var command = new SqlCommand("CreateCartForUser", connection))
             {
                 command.Transaction = transaction;
+                command.CommandType = CommandType.StoredProcedure;
                 command.Parameters.AddWithValue("@UserId", userId);
                 return (int)await command.ExecuteScalarAsync();
             }
         }
-      #endregion
+        #endregion
     }
 }
 

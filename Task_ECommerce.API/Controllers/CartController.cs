@@ -40,7 +40,7 @@ namespace Task_ECommerce.API.Controllers
         /// <param name="userId"></param>
         /// <returns></returns>
         [HttpGet("{userId}")]
-        public async Task<ActionResult<IEnumerable<CartDTO>>> GetCartByUserIdAsync(int userId)
+        public async Task<IActionResult> GetCartByUserIdAsync(int userId)
         {
             var cart = await _cartService.GetCartByUserIdAsync(userId);
             return Ok(cart);
