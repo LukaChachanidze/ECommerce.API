@@ -29,7 +29,7 @@ namespace Task_ECommerce.API.Controllers
         /// Method to get all the products
         /// </summary>
         /// <returns>All the products</returns>
-        [HttpGet]
+        [HttpGet(nameof(GetAllProductsAsync))]
         public async Task<IActionResult> GetAllProductsAsync()
         {
             var products = await _productService.GetAllProductsAsync();
