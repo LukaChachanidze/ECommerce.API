@@ -104,6 +104,7 @@ namespace Task_ECommerce.Repository.ProductsRepository
                     command.Parameters.AddWithValue("@Name", entity.Name);
                     command.Parameters.AddWithValue("@Description", entity.Description);
                     command.Parameters.AddWithValue("@Id", entity.Id);
+                    command.Parameters.AddWithValue("@Price", entity.Price);
 
                     return await command.ExecuteNonQueryAsync();
                 }

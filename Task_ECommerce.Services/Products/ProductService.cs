@@ -38,7 +38,8 @@ namespace Task_ECommerce.Services.Products
                     {
                         Id = product.Id,
                         Name = product.Name,
-                        Description = product.Description
+                        Description = product.Description,
+                        Price = product.Price
                     };
                 }
             }
@@ -66,7 +67,8 @@ namespace Task_ECommerce.Services.Products
                     {
                         Id = x.Id,
                         Name = x.Name,
-                        Description = x.Description
+                        Description = x.Description,
+                        Price = x.Price,
                     });
                 }
             }
@@ -94,7 +96,8 @@ namespace Task_ECommerce.Services.Products
                     {
                         Id = productDto.Id,
                         Name = productDto.Name,
-                        Description = productDto.Description
+                        Description = productDto.Description,
+                        Price = productDto.Price,
                     };
                     return await _productRepository.UpdateAsync(product);
                 }
@@ -120,7 +123,8 @@ namespace Task_ECommerce.Services.Products
                 var product = new Product
                 {
                     Name = productDto.Name,
-                    Description = productDto.Description
+                    Description = productDto.Description,
+                    Price = productDto.Price
                 };
                 try
                 {
