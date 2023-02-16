@@ -63,7 +63,7 @@ namespace Task_ECommerce.API.Controllers
         /// Method to update existing product
         /// </summary>
         /// <param name="updateProductDto"></param>
-        [HttpPut]
+        [HttpPost(nameof(UpdateProductAsync))]
         public async Task<IActionResult> UpdateProductAsync(UpdateProductDTO updateProductDto)
         {
             var product = await _productService.UpdateProductAsync(updateProductDto);
@@ -74,7 +74,7 @@ namespace Task_ECommerce.API.Controllers
         /// Method to delete product by its id
         /// </summary>
         /// <param name="id"></param>
-        [HttpDelete("{id}")]
+        [HttpPost("{id}")]
         public async Task<IActionResult> DeleteProductAsync(int id)
         {
             await _productService.DeleteProductAsync(id);

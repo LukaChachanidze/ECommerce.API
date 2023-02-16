@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Configuration;
 using Task_ECommerce.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
