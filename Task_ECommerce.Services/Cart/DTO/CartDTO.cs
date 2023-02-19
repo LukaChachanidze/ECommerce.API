@@ -7,8 +7,15 @@
     {
         public int Id { get; set; }
         public int ProductId { get; set; }
-        public string ProductName { get; set; }
-        public decimal ProductPrice { get; set; }
+        /// <summary>
+        /// Product Name
+        /// </summary>
+        public string Name { get; set; }
+        /// <summary>
+        /// Product Price
+        /// </summary>
+        public decimal Price { get; set; }
         public int Quantity { get; set; }
+        public int ItemId { get; set; }
     }   
 }

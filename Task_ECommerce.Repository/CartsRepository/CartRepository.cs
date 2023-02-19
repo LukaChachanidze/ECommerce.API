@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
+using System.Transactions;
 using Task_ECommerce.Domain.Entities;
 
 namespace Task_ECommerce.Repository.CartsRepository
@@ -93,6 +94,11 @@ namespace Task_ECommerce.Repository.CartsRepository
                                 Id = (int)reader["Id"],
                                 ProductId = (int)reader["ProductId"],
                                 Quantity = (int)reader["Quantity"],
+                                Product = new Product() {
+                                    Name = (string)reader["Name"],
+                                    Description = (string)reader["Description"],
+                                    Price = (decimal)reader["Price"]
+                                }
                             };
                             cartItems.Add(cartItem);
                         }
@@ -112,32 +118,29 @@ namespace Task_ECommerce.Repository.CartsRepository
         /// <param name="quantity"></param>
         /// <param name="cartId"></param>
         /// <returns></returns>
-        public async Task AddProductToCartAsync(int userId, int productId, int quantity, int? cartId)
+        public async Task AddProductToCartAsync(int userId, int productId, int quantity)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
-                using (var transaction = connection.BeginTransaction())
-                {
-                     cartId = await GetCartIdForUserAsync(userId, connection, transaction);
+
+                    int? cartId = await GetCartIdForUserAsync(userId, connection);
 
                     if (cartId == null)
                     {
-                        cartId = await CreateCartForUserAsync(userId, connection, transaction);
+                        cartId = await CreateCartForUserAsync(userId, connection);
                     }
 
                     using (var command = new SqlCommand("AddProductToCart", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
-                        command.Transaction = transaction;
                         command.Parameters.AddWithValue("@ProductId", productId);
                         command.Parameters.AddWithValue("@Quantity", quantity);
                         command.Parameters.AddWithValue("@CartId", cartId);
                         await command.ExecuteNonQueryAsync();
                     }
 
-                    transaction.Commit();
-                }
+                await connection.CloseAsync();
             }
         }
 
@@ -148,20 +151,23 @@ namespace Task_ECommerce.Repository.CartsRepository
         /// <param name="productId"></param>
         /// <param name="cartId"></param>
         /// <returns></returns>
-        public async Task RemoveProductFromCartAsync(int userId, int productId, int cartId)
+        public async Task RemoveProductFromCartAsync(int userId, int id)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
+
+                int? cartId = await GetCartIdForUserAsync(userId, connection);
+
                 using (var command = new SqlCommand("RemoveProductFromCart", connection))
                 {
                     command.CommandType = CommandType.StoredProcedure;
                     command.Parameters.AddWithValue("@CartId", cartId);
                     command.Parameters.AddWithValue("@UserId", userId);
-                    command.Parameters.AddWithValue("@ProductId", productId);
+                    command.Parameters.AddWithValue("@ProductId", id);
                     await command.ExecuteNonQueryAsync();
                 }
-            }
+            }            
         }
 
         /// <summary>
@@ -186,30 +192,31 @@ namespace Task_ECommerce.Repository.CartsRepository
 
 
         #region private methods
-        private async Task<int?> GetCartIdForUserAsync(int userId, SqlConnection connection, SqlTransaction transaction)
+        private async Task<int?> GetCartIdForUserAsync(int userId, SqlConnection connection)
         {
             using (var command = new SqlCommand("GetCartIdForUser", connection))
-            {
-                command.Transaction = transaction;
+            {           
                 command.CommandType = CommandType.StoredProcedure;
                 command.Parameters.AddWithValue("@UserId", userId);
                 var result = await command.ExecuteScalarAsync();
+
                 if (result != null)
                 {
                     return (int)result;
                 }
+
                 return null;
             }
         }
 
-        private async Task<int> CreateCartForUserAsync(int userId, SqlConnection connection, SqlTransaction transaction)
+
+        private async Task<int> CreateCartForUserAsync(int userId, SqlConnection connection)
         {
             using (var command = new SqlCommand("CreateCartForUser", connection))
             {
-                command.Transaction = transaction;
                 command.CommandType = CommandType.StoredProcedure;
                 command.Parameters.AddWithValue("@UserId", userId);
-                return (int)await command.ExecuteScalarAsync();
+                return  (int)await command.ExecuteScalarAsync();       
             }
         }
         #endregion

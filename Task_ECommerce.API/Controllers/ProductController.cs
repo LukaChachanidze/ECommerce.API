@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Task_ECommerce.API.Models.Products.Responses;
 using Task_ECommerce.Services.Products;
 using Task_ECommerce.Services.Products.DTO;
 
@@ -56,7 +57,7 @@ namespace Task_ECommerce.API.Controllers
         public async Task<IActionResult> InsertProductAsync(CreateProductDTO createProductDto)
         {
             await _productService.InsertProductAsync(createProductDto);
-            return Ok("Succesfully Created");
+            return Ok(new ProductResponse { IsSuccess = true, Description = "Successfully created"});
         }
 
         /// <summary>
@@ -67,7 +68,7 @@ namespace Task_ECommerce.API.Controllers
         public async Task<IActionResult> UpdateProductAsync(UpdateProductDTO updateProductDto)
         {
             var product = await _productService.UpdateProductAsync(updateProductDto);
-            return Ok("Succesfully updated");
+            return Ok(new ProductResponse { IsSuccess = true, Description = "Successfully Updated" });
         }
 
         /// <summary>
@@ -78,7 +79,7 @@ namespace Task_ECommerce.API.Controllers
         public async Task<IActionResult> DeleteProductAsync(int id)
         {
             await _productService.DeleteProductAsync(id);
-            return Ok("Succesfully deleted");
+            return Ok(new ProductResponse { IsSuccess = true, Description = "Successfully deleted" });
         }
         #endregion
     }

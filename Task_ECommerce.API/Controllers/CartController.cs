@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Task_ECommerce.API.Models.Carts.Responses;
 using Task_ECommerce.Services.Cart;
 using Task_ECommerce.Services.Cart.DTO;
 
@@ -23,18 +24,6 @@ namespace Task_ECommerce.API.Controllers
 
         #region action methods
         /// <summary>
-        /// Method to create a new cart
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <returns></returns>
-        [HttpPost("{userId}")]
-        public async Task<IActionResult> CreateCartAsync(int userId)
-        {
-            await _cartService.CreateCartAsync(userId);
-            return Ok("Successfully created cart");
-        }
-
-        /// <summary>
         /// method to get cart by user Id
         /// </summary>
         /// <param name="userId"></param>
@@ -53,11 +42,11 @@ namespace Task_ECommerce.API.Controllers
         /// <param name="cartId"></param>
         /// <param name="product"></param>
         /// <returns></returns>
-        [HttpPost("{userId}/{cartId}/products")]
-        public async Task<IActionResult> AddProductToCartAsync(int userId, int cartId, [FromBody] CartProductDTO product)
+        [HttpPost("{userId}/products")]
+        public async Task<IActionResult> AddProductToCartAsync(int userId, [FromBody] CartProductDTO product)
         {
-            await _cartService.AddProductToCartAsync(userId, product.ProductId, product.Quantity, cartId);
-            return Ok("Successfully added");
+            await _cartService.AddProductToCartAsync(userId, product.Id, product.Quantity);
+            return Ok(new CartResponse { IsSuccess = true, Description = "Successfully added product to cart"});
         }
 
         /// <summary>
@@ -66,11 +55,11 @@ namespace Task_ECommerce.API.Controllers
         /// <param name="userId"></param>
         /// <param name="productId"></param>
         /// <returns></returns>
-        [HttpDelete("{userId}/{cartId}/products/{productId}")]
-        public async Task<IActionResult> RemoveProductFromCartAsync(int userId, int productId, int cartId)
+        [HttpPost("{userId}/{id}")]
+        public async Task<IActionResult> RemoveProductFromCartAsync(int userId, int id)
         {
-            await _cartService.RemoveProductFromCartAsync(userId, productId, cartId);
-            return Ok("Successfully removed");
+            await _cartService.RemoveProductFromCartAsync(userId, id);
+            return Ok(new CartResponse { IsSuccess = true, Description = "Successfully removed product from cart" });
         }
 
         /// <summary>
@@ -78,11 +67,11 @@ namespace Task_ECommerce.API.Controllers
         /// </summary>
         /// <param name="cartId"></param>
         /// <returns></returns>
-        [HttpDelete("{cartId}")]
+        [HttpPost("{cartId}")]
         public async Task<IActionResult> DeleteCartAsync(int cartId)
         {
             await _cartService.DeleteCartAsync(cartId);
-            return Ok("Successfully deleted");
+            return Ok(new CartResponse {  IsSuccess = true, Description = "Successfully deleted"});
         }
     }
     #endregion

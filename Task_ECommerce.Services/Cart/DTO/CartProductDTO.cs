@@ -5,7 +5,10 @@
     /// </summary>
     public class CartProductDTO
     {
-        public int ProductId { get; set; }
+        /// <summary>
+        /// Product Id
+        /// </summary>
+        public int Id { get; set; }
         public int Quantity { get; set; }
     }
 }

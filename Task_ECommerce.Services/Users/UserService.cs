@@ -1,4 +1,5 @@
 ﻿using Task_ECommerce.Domain.Entities;
+using Task_ECommerce.Domain.Models.Users.Responses;
 using Task_ECommerce.Repository.UsersRepository;
 using Task_ECommerce.Services.Encryption;
 using Task_ECommerce.Services.Jwt;
@@ -26,7 +27,7 @@ namespace Task_ECommerce.Services.Users
         /// <param name="password"></param>
         /// <returns>JWT Token</returns>
         /// <exception cref="Exception"></exception>
-        public async Task<string> LoginAsync(string userName, string password)
+        public async Task<LoginResponse> LoginAsync(string userName, string password)
         {
             try
             {
@@ -48,7 +49,8 @@ namespace Task_ECommerce.Services.Users
                 {
                     throw new Exception("Error occured while creating token");
                 }
-                return token;
+
+                return new LoginResponse() { Token = token, UserId = user.Id };
 
             }
             catch (Exception ex)

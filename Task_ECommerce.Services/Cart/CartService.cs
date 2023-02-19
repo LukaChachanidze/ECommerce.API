@@ -44,7 +44,9 @@ namespace Task_ECommerce.Services.Cart
             {
                 Id = x.Id,
                 ProductId = x.ProductId,
-                Quantity = x.Quantity
+                Quantity = x.Quantity,
+                Name = x.Product.Name,
+                Price = x.Product.Price,
             });
         }
 
@@ -56,9 +58,9 @@ namespace Task_ECommerce.Services.Cart
         /// <param name="quantity"></param>
         /// <param name="cartId"></param>
         /// <returns></returns>
-        public async Task AddProductToCartAsync(int userId, int productId, int quantity, int cartId)
+        public async Task AddProductToCartAsync(int userId, int productId, int quantity)
         {
-            await _cartRepository.AddProductToCartAsync(userId, productId, quantity, cartId);
+            await _cartRepository.AddProductToCartAsync(userId, productId, quantity);
         }
 
         /// <summary>
@@ -68,9 +70,9 @@ namespace Task_ECommerce.Services.Cart
         /// <param name="productId"></param>
         /// <param name="cartId"></param>
         /// <returns></returns>
-        public async Task RemoveProductFromCartAsync(int userId, int productId, int cartId)
+        public async Task RemoveProductFromCartAsync(int userId, int id)
         {
-            await _cartRepository.RemoveProductFromCartAsync(userId, productId, cartId);
+            await _cartRepository.RemoveProductFromCartAsync(userId, id);
         }
 
         /// <summary>

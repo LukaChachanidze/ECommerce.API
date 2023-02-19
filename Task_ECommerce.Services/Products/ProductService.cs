@@ -124,7 +124,8 @@ namespace Task_ECommerce.Services.Products
                 {
                     Name = productDto.Name,
                     Description = productDto.Description,
-                    Price = productDto.Price
+                    Price = productDto.Price,
+                    
                 };
                 try
                 {

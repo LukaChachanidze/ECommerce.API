@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Task_ECommerce.API.Models.Users.Responses;
 using Task_ECommerce.Services.Users;
 using Task_ECommerce.Services.Users.DTO;
@@ -48,8 +49,8 @@ namespace Task_ECommerce.API.Controllers
         [HttpPost(nameof(Login))]
         public async Task<IActionResult> Login([FromBody] UserForLoginDTO request)
         {
-            string token = await _userService.LoginAsync(request.UserName, request.Password);
-            return Ok(new LoginResponse() { Token = token });
+            var result = await _userService.LoginAsync(request.UserName, request.Password);
+            return Ok(new LoginResponse() { Token = result.Token, UserId = result.UserId});
         }
         #endregion
     }

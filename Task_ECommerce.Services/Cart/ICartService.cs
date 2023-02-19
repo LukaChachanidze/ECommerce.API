@@ -8,8 +8,8 @@ namespace Task_ECommerce.Services.Cart
     public interface ICartService
     {
         Task<IEnumerable<CartDTO>> GetCartByUserIdAsync(int userId);
-        Task AddProductToCartAsync(int userId, int productId, int quantity, int cartId);
-        Task RemoveProductFromCartAsync(int userId, int productId, int cartId);
+        Task AddProductToCartAsync(int userId, int productId, int quantity);
+        Task RemoveProductFromCartAsync(int userId, int id);
         Task DeleteCartAsync(int cartId);
         Task CreateCartAsync(int userId);
     }

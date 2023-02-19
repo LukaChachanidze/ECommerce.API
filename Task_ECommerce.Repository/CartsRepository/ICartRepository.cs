@@ -9,8 +9,8 @@ namespace Task_ECommerce.Repository.CartsRepository
     {
         Task<Cart> GetCartByUserIdAsync(int userId);
         Task<IEnumerable<CartItem>> GetCartItemsByCartIdAsync(int cartId);
-        Task AddProductToCartAsync(int userId, int productId, int quantity, int? cartId);
-        Task RemoveProductFromCartAsync(int userId, int productId, int cartId);
+        Task AddProductToCartAsync(int userId, int productId, int quantity);
+        Task RemoveProductFromCartAsync(int userId, int id);
         Task DeleteCartAsync(int cartId);
         Task CreateCartAsync(int userId);
     }
